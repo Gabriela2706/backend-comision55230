@@ -1,19 +1,35 @@
 class ProductManager {
+  #id = 0;
   constructor() {
     this.products = [];
   }
-  addProducts = (title, description, price, thumbnail, code, stock) => {
+  addProducts = (prod) => {
+    const { title, description, price, thumbnail, code, stock } = prod;
+
+    const validation = this.products.some(
+      (productfind) => productfind.code === code
+    );
+    if (validation) {
+      console.log("Producto con codigo ya existente");
+      return;
+    }
+    // PROBE CON EL INCLUDE Y NO ME DEVUELVE ERROR COMO EL SOME.
+    // TE LO DEJO PARA VER SI ESTA BIEN HECHO O NO FUNCIONA POR ALGO QUE HICE MAL.
+
+    // const validation2 = this.products.includes(
+    //   (prodfind) => prodfind.code === code
+    // );
+    // if (validation2) {
+    //   console.log("producto ya encontrado con includes");
+    //   return;
+    // }
+
     const newProduct = {
-      id: this.products.length + 1,
-      title,
-      description,
-      price,
-      thumbnail,
-      code,
-      stock,
+      id: this.#id++,
+      ...prod,
     };
     this.products.push(newProduct);
-    return;
+    return console.log("Producto Agregado Correctamente");
   };
 
   getProducts = () => {
@@ -25,37 +41,38 @@ class ProductManager {
       (product) => product.id == idProduct
     );
     if (encontrarProducto) {
-      console.log(`el producto encontrado es ${encontrarProducto.id}`);
+      console.log(`Producto Encontrado!! `);
+      return encontrarProducto;
     } else {
-      console.log(`El producto no se encuentra`);
+      return `El producto con id ${idProduct} no se encuentra en nuestra lista`;
     }
   };
 }
-const productoX = new ProductManager();
-productoX.addProducts(
-  `Remera Guason`,
-  `Remera mangas cortas al cuerpo`,
-  `6420`,
-  `https://res.cloudinary.com/dy66f9pgr/image/upload/v1687020677/guason_cntzhv.jpg`,
-  `R_01`,
-  20
-);
-productoX.addProducts(
-  `Remera Batman`,
-  `Remera mangas cortas al cuerpo`,
-  `7520`,
-  `https://res.cloudinary.com/dy66f9pgr/image/upload/v1687020680/batman_djggwa.png`,
-  `R_25`,
-  17
-);
-productoX.addProducts(
-  `Remera Capitan America`,
-  `Remera mangas cortas al cuerpo`,
-  `6420`,
-  `https://res.cloudinary.com/dy66f9pgr/image/upload/v1687020677/capitan_america_k4zgbn.jpg`,
-  `R_35`,
-  15
-);
+const productManager = new ProductManager();
+productManager.addProducts({
+  title: `Remera Guason`,
+  description: `Remera mangas cortas al cuerpo`,
+  price: `6420`,
+  thumbnail: `https://res.cloudinary.com/dy66f9pgr/image/upload/v1687020677/guason_cntzhv.jpg`,
+  code: `R_25`,
+  stock: 20,
+});
+productManager.addProducts({
+  title: `Remera Batman`,
+  description: `Remera mangas cortas al cuerpo`,
+  price: `7520`,
+  thumbnail: `https://res.cloudinary.com/dy66f9pgr/image/upload/v1687020680/batman_djggwa.png`,
+  code: `R_25`,
+  stock: 17,
+});
+productManager.addProducts({
+  title: `Remera Capitan America`,
+  description: `Remera mangas cortas al cuerpo`,
+  price: `6420`,
+  thumbnail: `https://res.cloudinary.com/dy66f9pgr/image/upload/v1687020677/capitan_america_k4zgbn.jpg`,
+  code: `R_35`,
+  stock: 15,
+});
 
-console.log(productoX.getProducts());
-console.log(productoX.getProductById(6));
+console.log(productManager.getProducts());
+console.log(productManager.getProductById(1));
