@@ -1,9 +1,13 @@
+import fs from "fs";
+
 class ProductManager {
   #id = 0;
   constructor() {
     this.products = [];
+    this.path = "./files.txt"; // AGREGO EL METODO PATH PARA PODER USAR LA PERSISTENCIA EN EL RESTO DEL CODIGO
   }
-  addProducts = (prod) => {
+  addProducts = async (prod) => {
+    // CONVIERTO LA FUNCION EN ASINCRONA AGREGANDOLE EL ASYNC
     const { title, description, price, thumbnail, code, stock } = prod;
 
     const validation = this.products.some(
@@ -13,23 +17,19 @@ class ProductManager {
       console.log("Producto con codigo ya existente");
       return;
     }
-    // PROBE CON EL INCLUDE Y NO ME DEVUELVE ERROR COMO EL SOME.
-    // TE LO DEJO PARA VER SI ESTA BIEN HECHO O NO FUNCIONA POR ALGO QUE HICE MAL.
 
-    // const validation2 = this.products.includes(
-    //   (prodfind) => prodfind.code === code
-    // );
-    // if (validation2) {
-    //   console.log("producto ya encontrado con includes");
-    //   return;
-    // }
+    const fileProducts = await fs.promises.readFile(this.path, "utf8"); // GUARDO EN UNA VARIABLE LA LECTURA DE CADA AGREGADO DE PRODUCTOS
+    const productParseado = JSON.parse(fileProducts); // LO PASO A OBJETO ASI PUEDO AGREGARLO COMO PRODUCTO CON PROPIEDADES
 
     const newProduct = {
       id: this.#id++,
       ...prod,
     };
-    this.products.push(newProduct);
-    return console.log("Producto Agregado Correctamente");
+    this.products = productParseado; // IGUALO EL THIS.PRODUCTS CON EL NUEVO PRODUCTO PARSEADO
+    productParseado.push(newProduct); // LE EMPUJO EL NUEVO PRODUCTO
+    // return console.log("Producto Agregado Correctamente");
+    await fs.promises.writeFile(this.path, JSON.stringify(productParseado)); // ESCRIBO EN EL ARCHIVO EL NUEVO PRODUCTO PASADO A TEXTO PLANO
+    return productParseado;
   };
 
   getProducts = () => {
@@ -49,7 +49,7 @@ class ProductManager {
   };
 }
 const productManager = new ProductManager();
-productManager.addProducts({
+await productManager.addProducts({
   title: `Remera Guason`,
   description: `Remera mangas cortas al cuerpo`,
   price: `6420`,
@@ -57,7 +57,7 @@ productManager.addProducts({
   code: `R_25`,
   stock: 20,
 });
-productManager.addProducts({
+await ProductManager.addProducts({
   title: `Remera Batman`,
   description: `Remera mangas cortas al cuerpo`,
   price: `7520`,
@@ -65,7 +65,7 @@ productManager.addProducts({
   code: `R_25`,
   stock: 17,
 });
-productManager.addProducts({
+await ProductManager.addProducts({
   title: `Remera Capitan America`,
   description: `Remera mangas cortas al cuerpo`,
   price: `6420`,
@@ -74,5 +74,5 @@ productManager.addProducts({
   stock: 15,
 });
 
-console.log(productManager.getProducts());
-console.log(productManager.getProductById(1));
+console.log(ProductManager.getProducts());
+console.log(ProductManager.getProductById(1));
